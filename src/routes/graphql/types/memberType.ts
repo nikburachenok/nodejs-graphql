@@ -6,7 +6,7 @@ import {
 } from "graphql";
 import { MemberTypeIdGql } from "./memberTypeId.js";
 
-export const MemberType = new GraphQLObjectType({
+export const MemberType: GraphQLObjectType = new GraphQLObjectType({
     name: "MemberType",
     fields: {
         id: { type: new GraphQLNonNull(MemberTypeIdGql) },
