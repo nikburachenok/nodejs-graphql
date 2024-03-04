@@ -8,10 +8,9 @@ import {
   parse,
   validate
 } from 'graphql';
-import { PrismaClient } from '@prisma/client';
 import depthLimit from 'graphql-depth-limit';
+import { Context } from './types/context.js';
 
-export const prisma = new PrismaClient();
 const gqlSchema = new GraphQLSchema({
   query: Query,
   mutation: Mutation
@@ -19,6 +18,7 @@ const gqlSchema = new GraphQLSchema({
 
 const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
   const { prisma } = fastify;
+  const context: Context = { prisma }
 
   fastify.route({
     url: '/',
@@ -41,7 +41,7 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
         schema: gqlSchema,
         source: query,
         variableValues: variables,
-        // contextValue
+        contextValue: context
       })
     },
   });

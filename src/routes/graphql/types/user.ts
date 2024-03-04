@@ -9,7 +9,7 @@ import {
 import { ProfileType } from "./profile.js";
 import { UUIDType } from "./uuid.js";
 import { PostType } from "./post.js";
-import { prisma } from "../index.js";
+import { Context } from "./context.js";
 
 export const UserType: GraphQLObjectType = new GraphQLObjectType({
     name: "User",
@@ -19,24 +19,26 @@ export const UserType: GraphQLObjectType = new GraphQLObjectType({
         balance: { type: GraphQLFloat },
         profile: {
             type: ProfileType,
-            resolve: async ({ id }: { id: string }) => await prisma.profile.findUnique({ where: { userId: id } }),
+            resolve: async ({ id }: { id: string }, __, context: Context) =>
+                await context.prisma.profile.findUnique({ where: { userId: id } }),
         },
         posts: {
             type: new GraphQLList(PostType),
-            resolve: async ({ id }: { id: string }) => await prisma.post.findMany({ where: { authorId: id } }),
+            resolve: async ({ id }: { id: string }, __, context: Context) =>
+                await context.prisma.post.findMany({ where: { authorId: id } }),
         },
         userSubscribedTo: {
             type: new GraphQLList(UserType),
-            resolve: async ({ id }: { id: string }) => {
-                const usersId = await prisma.subscribersOnAuthors.findMany({ where: { subscriberId: id } });
-                return usersId.map(async ({ authorId: id }) => await prisma.user.findUnique({ where: { id } }));
+            resolve: async ({ id }: { id: string }, __, context: Context) => {
+                const usersId = await context.prisma.subscribersOnAuthors.findMany({ where: { subscriberId: id } });
+                return usersId.map(async ({ authorId: id }) => await context.prisma.user.findUnique({ where: { id } }));
             }
         },
         subscribedToUser: {
             type: new GraphQLList(UserType),
-            resolve: async ({ id }: { id:string }) => {
-                const usersId = await prisma.subscribersOnAuthors.findMany({ where: { authorId: id } });
-                return usersId.map(async ({ subscriberId: id }) => await prisma.user.findUnique({ where: { id } }));
+            resolve: async ({ id }: { id:string }, __, context: Context) => {
+                const usersId = await context.prisma.subscribersOnAuthors.findMany({ where: { authorId: id } });
+                return usersId.map(async ({ subscriberId: id }) => await context.prisma.user.findUnique({ where: { id } }));
             }
         }
     })
