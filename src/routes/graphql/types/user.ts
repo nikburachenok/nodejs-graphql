@@ -20,26 +20,22 @@ export const UserType: GraphQLObjectType = new GraphQLObjectType({
         profile: {
             type: ProfileType,
             resolve: async ({ id }: { id: string }, __, context: Context) =>
-                await context.prisma.profile.findUnique({ where: { userId: id } }),
+                await context.dataLoader.profileLoader.load(id)
         },
         posts: {
             type: new GraphQLList(PostType),
             resolve: async ({ id }: { id: string }, __, context: Context) =>
-                await context.prisma.post.findMany({ where: { authorId: id } }),
+                await context.dataLoader.postsLoader.load(id),
         },
         userSubscribedTo: {
             type: new GraphQLList(UserType),
-            resolve: async ({ id }: { id: string }, __, context: Context) => {
-                const usersId = await context.prisma.subscribersOnAuthors.findMany({ where: { subscriberId: id } });
-                return usersId.map(async ({ authorId: id }) => await context.prisma.user.findUnique({ where: { id } }));
-            }
+            resolve: async ({ id }: { id: string }, __, context: Context) =>
+                await context.dataLoader.userSubscribedToLoader.load(id)
         },
         subscribedToUser: {
             type: new GraphQLList(UserType),
-            resolve: async ({ id }: { id:string }, __, context: Context) => {
-                const usersId = await context.prisma.subscribersOnAuthors.findMany({ where: { authorId: id } });
-                return usersId.map(async ({ subscriberId: id }) => await context.prisma.user.findUnique({ where: { id } }));
-            }
+            resolve: async ({ id }: { id:string }, __, context: Context) =>
+                await context.dataLoader.subscribedToUserLoader.load(id)
         }
     })
 });

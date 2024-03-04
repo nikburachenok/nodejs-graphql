@@ -11,35 +11,47 @@ export const Mutation = new GraphQLObjectType({
         createPost: {
             type: PostType,
             args: { dto: { type: new GraphQLNonNull(CreatePostInput) } },
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            resolve: async (_parent, { dto }, context: Context) => await context.prisma.post.create({ data: dto }),
+            resolve: async (
+                _parent,
+                { dto }: { dto: { title: string; content: string; authorId: string; } },
+                context: Context
+            ) => await context.prisma.post.create({ data: dto }),
         },
         createUser: {
             type: UserType,
             args: { dto: { type: CreateUserInput } },
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            resolve: async (_parent, { dto }, context: Context) => await context.prisma.user.create({ data: dto }),
+            resolve: async (
+                _parent,
+                { dto }: { dto: { name: string; balance: number; } },
+                context: Context
+            ) => await context.prisma.user.create({ data: dto }),
         },
         createProfile: {
             type: ProfileType,
             args: { dto: { type: CreateProfileInput } },
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            resolve: async (_parent, { dto }, context: Context) => await context.prisma.profile.create({ data: dto }),
+            resolve: async (
+                _parent,
+                { dto }: { dto: { isMale: boolean; yearOfBirth: number; memberTypeId: string; userId: string; } },
+                context: Context
+            ) => await context.prisma.profile.create({ data: dto }),
         },
         deletePost: {
             type: UUIDType,
             args: { id: { type: UUIDType } },
-            resolve: async (_parent, { id }: { id: string }, context: Context) => (await context.prisma.post.delete({ where: { id } })).id,
+            resolve: async (_parent, { id }: { id: string }, context: Context) =>
+                (await context.prisma.post.delete({ where: { id } })).id,
         },
         deleteUser: {
             type: UUIDType,
             args: { id: { type: UUIDType } },
-            resolve: async (_parent, { id }: { id: string }, context: Context) => (await context.prisma.user.delete({ where: { id } })).id,
+            resolve: async (_parent, { id }: { id: string }, context: Context) =>
+                (await context.prisma.user.delete({ where: { id } })).id,
         },
         deleteProfile: {
             type: UUIDType,
             args: { id: { type: UUIDType } },
-            resolve: async (_parent, { id }: { id: string }, context: Context) => (await context.prisma.profile.delete({ where: { id } })).id,
+            resolve: async (_parent, { id }: { id: string }, context: Context) =>
+                (await context.prisma.profile.delete({ where: { id } })).id,
         },
         changePost: {
             type: PostType,
@@ -47,8 +59,14 @@ export const Mutation = new GraphQLObjectType({
                 id: { type: new GraphQLNonNull(UUIDType) },
                 dto: { type: new GraphQLNonNull(ChangePostInput) }
             },
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            resolve: async (_parent, { id, dto }, context: Context) => await context.prisma.post.update( {where: { id }, data: dto } ),
+            resolve: async (
+                _parent,
+                { id, dto }: {
+                    id: string,
+                    dto: { title: string; content: string; authorId: string; }
+                },
+                context: Context
+            ) => await context.prisma.post.update( { where: { id }, data: dto } ),
         },
         changeProfile: {
             type: ProfileType,
@@ -56,8 +74,14 @@ export const Mutation = new GraphQLObjectType({
                 id: { type: new GraphQLNonNull(UUIDType) },
                 dto: { type: new GraphQLNonNull(ChangeProfileInput) }
             },
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            resolve: async (_parent, { id, dto }, context: Context) => await context.prisma.profile.update( {where: { id }, data: dto } ),
+            resolve: async (
+                _parent,
+                { id, dto }: {
+                    id: string,
+                    dto: { isMale: boolean; yearOfBirth: number; memberTypeId: string; userId: string; }
+                },
+                context: Context
+            ) => await context.prisma.profile.update( {where: { id }, data: dto } ),
         },
         changeUser: {
             type: UserType,
@@ -65,8 +89,14 @@ export const Mutation = new GraphQLObjectType({
                 id: { type: new GraphQLNonNull(UUIDType) },
                 dto: { type: new GraphQLNonNull(ChangeUserInput) }
             },
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            resolve: async (_parent, { id, dto }, context: Context) => await context.prisma.user.update( {where: { id }, data: dto } ),
+            resolve: async (
+                _parent,
+                { id, dto }: {
+                    id: string,
+                    dto: { name: string; balance: number; }
+                },
+                context: Context
+            ) => await context.prisma.user.update( {where: { id }, data: dto } ),
         },
         subscribeTo: {
             type: UserType,
